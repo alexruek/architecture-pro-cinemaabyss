@@ -291,7 +291,7 @@ minikube tunnel
 11. Вызовите https://cinemaabyss.example.com/api/movies
     Вы должны увидеть вывод списка фильмов
     Можно поэкспериментировать со значением   MOVIES_MIGRATION_PERCENT в src/kubernetes/configmap.yaml и убедится, что вызовы movies уходят полностью в новый сервис
-12. Запустите тесты из папки tests/postman
+13. Запустите тесты из папки tests/postman
 
 ```bash
  npm run test:kubernetes
@@ -302,6 +302,8 @@ minikube tunnel
 #### Шаг 3
 
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
+    ![img.png](src/architecture/screenshots/img_4.png)
+![img.png](src/architecture/screenshots/img_6.png)
 
 ## Задание 4
 
