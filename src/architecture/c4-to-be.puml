@@ -1,0 +1,49 @@
+@startuml CinemaAbyss_C4_ToBe
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title CinemaAbyss — To-Be Architecture (C4 Container Diagram)
+
+Person(user, "Пользователь", "Клиент стримингового сервиса.\nБраузер / мобильное приложение")
+
+System_Boundary(cinemaabyss, "CinemaAbyss Platform") {
+
+    Container(proxy, "Proxy Service\n(API Gateway)", "Go / HTTP", "Единая точка входа.\nСтупенчатая миграция трафика\nпо паттерну Strangler Fig.\nФиче-флаг MOVIES_MIGRATION_PERCENT\nуправляет % запросов к movies-service.", $tags="gateway")
+
+    Container(monolith, "Monolith", "Go / net/http", "Обрабатывает:\n/api/users\n/api/payments\n/api/subscriptions\n/api/movies (остаток трафика во время миграции)")
+
+    Container(movies, "Movies Service", "Go / net/http", "Выделенный микросервис\nметаданных фильмов.\n/api/movies\n/api/movies?id={id}", $tags="microservice")
+
+    Container(events, "Events Service", "Go / Kafka", "MVP Kafka-сервис.\nСоздаёт и читает события:\nUser / Payment / Movie.\n/api/events", $tags="microservice")
+
+    ContainerDb(postgres, "PostgreSQL", "postgres:14", "Общая реляционная БД.\nТаблицы: users, movies,\nmovie_genres, payments,\nsubscriptions")
+
+    Container(kafka, "Apache Kafka", "wurstmeister/kafka 2.7", "Брокер сообщений.\nТопики:\n• movie-events\n• user-events\n• payment-events")
+
+    Container(zookeeper, "ZooKeeper", "wurstmeister/zookeeper", "Координатор кластера Kafka")
+
+    Container(kafka_ui, "Kafka UI", "provectuslabs/kafka-ui", "Веб-интерфейс мониторинга\nтопиков и сообщений Kafka.\nlocalhost:8090")
+}
+
+' ─── Внешние взаимодействия ───────────────────────────────────
+Rel(user, proxy, "HTTP запросы", "HTTPS / REST\n:8000")
+
+' ─── Proxy → сервисы ──────────────────────────────────────────
+Rel(proxy, monolith, "Проксирует /api/users,\n/api/payments,\n/api/subscriptions\n+ % /api/movies", "HTTP\n:8080")
+Rel(proxy, movies, "Проксирует /api/movies\n(MOVIES_MIGRATION_PERCENT %)", "HTTP\n:8081")
+Rel(proxy, events, "Проксирует /api/events", "HTTP\n:8082")
+
+' ─── Сервисы → БД ─────────────────────────────────────────────
+Rel(monolith, postgres, "Читает / пишет\nusers, movies,\npayments, subscriptions", "SQL / TCP\n:5432")
+Rel(movies, postgres, "Читает / пишет\nmovies, movie_genres", "SQL / TCP\n:5432")
+
+' ─── Events → Kafka ───────────────────────────────────────────
+Rel(events, kafka, "Публикует события\n(Producer)", "PLAINTEXT\n:9092")
+Rel(kafka, events, "Потребляет события\n(Consumer)\nЗаписывает в лог", "PLAINTEXT\n:9092")
+
+' ─── Kafka инфраструктура ─────────────────────────────────────
+Rel(kafka, zookeeper, "Координация кластера", "TCP\n:2181")
+Rel(kafka_ui, kafka, "Мониторинг топиков\nи сообщений", "TCP\n:9092")
+
+@enduml
