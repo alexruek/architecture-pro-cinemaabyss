@@ -291,7 +291,7 @@ minikube tunnel
 11. Вызовите https://cinemaabyss.example.com/api/movies
     Вы должны увидеть вывод списка фильмов
     Можно поэкспериментировать со значением   MOVIES_MIGRATION_PERCENT в src/kubernetes/configmap.yaml и убедится, что вызовы movies уходят полностью в новый сервис
-12. Запустите тесты из папки tests/postman
+13. Запустите тесты из папки tests/postman
 
 ```bash
  npm run test:kubernetes
@@ -302,6 +302,8 @@ minikube tunnel
 #### Шаг 3
 
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
+    ![img.png](src/architecture/screenshots/img_4.png)
+![img.png](src/architecture/screenshots/img_6.png)
 
 ## Задание 4
 
@@ -378,6 +380,9 @@ minikube tunnel
 https://cinemaabyss.example.com/api/movies
 и приложите скриншот развертывания helm и вывода https://cinemaabyss.example.com/api/movies
 
+![img.png](src/architecture/screenshots/img_7.png)
+
+![img.png](src/architecture/screenshots/img_8.png)
 # Задание 5
 
 Компания планирует активно развиваться и для повышения надежности, безопасности, реализации сетевых паттернов типа Circuit Breaker и канареечного деплоя вам как архитектору необходимо развернуть istio и настроить circuit breaker для monolith и movies сервисов.
@@ -440,7 +445,8 @@ cluster.outbound|8081||movies-service.cinemaabyss.svc.cluster.local;.upstream_rq
 You can see 21 for the upstream_rq_pending_overflow value which means 21 calls so far have been flagged for circuit breaking.
 ```
 Приложите скриншот работы circuit breaker'а
-
+![img.png](src/architecture/screenshots/img_9.png)
+![img.png](src/architecture/screenshots/img_10.png)
 Удаляем все
 
 ```bash
