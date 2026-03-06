@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -52,12 +51,11 @@ services:
 
   # Monolith Service
   monolith:
-    build:
-      context: ./src/monolith
-      dockerfile: Dockerfile
+    image: ghcr.io/alexruek/architecture-pro-cinemaabyss/monolith:cinema
     container_name: cinemaabyss-monolith
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
@@ -68,12 +66,11 @@ services:
 
   # Movies Microservice
   movies-service:
-    build:
-      context: ./src/microservices/movies
-      dockerfile: Dockerfile
+    image: ghcr.io/alexruek/architecture-pro-cinemaabyss/movies-service:cinema
     container_name: cinemaabyss-movies-service
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "8081:8081"
     environment:
@@ -84,13 +81,13 @@ services:
 
   # Events Microservice
   events-service:
-    build:
-      context: ./src/microservices/events
-      dockerfile: Dockerfile
+    image: ghcr.io/alexruek/architecture-pro-cinemaabyss/events-service:cinema
     container_name: cinemaabyss-events-service
     depends_on:
-      - postgres
-      - kafka
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     ports:
       - "8082:8082"
     environment:
@@ -101,9 +98,7 @@ services:
 
   # Proxy Service (API Gateway)
   proxy-service:
-    build:
-      context: ./src/microservices/proxy
-      dockerfile: Dockerfile
+    image: ghcr.io/alexruek/architecture-pro-cinemaabyss/proxy-service:cinema
     container_name: cinemaabyss-proxy-service
     depends_on:
       - monolith
