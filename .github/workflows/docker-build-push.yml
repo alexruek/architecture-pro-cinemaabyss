@@ -131,8 +131,28 @@ jobs:
       - name: Start services with Docker Compose
         run: |
           docker compose up -d
-          echo "Waiting for services to be ready..."
-          sleep 120
+          echo "Waiting for services to be healthy..."
+          # Wait for monolith
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+              echo "Monolith is ready"
+              break
+            fi
+            echo "Waiting for monolith... attempt $i"
+            sleep 10
+          done
+          # Wait for proxy
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Proxy is ready"
+              break
+            fi
+            echo "Waiting for proxy... attempt $i"
+            sleep 10
+          done
+          # Show container status
+          docker compose ps
+          docker compose logs --tail=20
 
       - name: Run API Tests in Docker
         run: |
