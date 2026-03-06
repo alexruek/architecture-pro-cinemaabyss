@@ -445,7 +445,8 @@ cluster.outbound|8081||movies-service.cinemaabyss.svc.cluster.local;.upstream_rq
 You can see 21 for the upstream_rq_pending_overflow value which means 21 calls so far have been flagged for circuit breaking.
 ```
 Приложите скриншот работы circuit breaker'а
-
+![img.png](src/architecture/screenshots/img_9.png)
+![img.png](src/architecture/screenshots/img_10.png)
 Удаляем все
 
 ```bash
